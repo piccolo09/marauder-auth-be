@@ -40,7 +40,6 @@ python3 manage.py runserver
 [issues-shield]: https://img.shields.io/github/issues/piccolo09/marauder-auth-be.svg?style=for-the-badge
 [issues-url]: https://github.com/piccolo09/marauder-auth-be/issues
 [license-shield]: https://img.shields.io/github/license/piccolo09/marauder-auth-be.svg?style=for-the-badge
-[license-url]: https://choosealicense.com/licenses/mit/
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://www.linkedin.com/in/keshav-pachpinde-044531211/
 [license-url]: https://github.com/piccolo09/marauder-auth-be/blob/master/LICENSE.txt
