@@ -1,0 +1,21 @@
+{
+    "env":{
+    "ENV":"production",
+    "SECRET_KEY":{
+       "generator":"secret"
+    }
+ },
+ "addons":[
+    {
+       "plan":"heroku-postgresql:hobby-dev"
+    },
+    {
+       "plan":"heroku-redis:hobby-dev"
+    }
+ ],
+"buildpacks": [
+  {
+    "url": "https://github.com/heroku/heroku-buildpack-python.git"
+  }
+]
+}
