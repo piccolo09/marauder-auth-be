@@ -1,3 +1,4 @@
+
 [![Contributors][contributors-shield]][contributors-url]
 [![Forks][forks-shield]][forks-url]
 [![Stargazers][stars-shield]][stars-url]
@@ -14,4 +15,15 @@ Marauder is a Python - Django application for basic user management setup using 
 
 ```bash
 pip install -r requirements.txt
+python3 manage.py migrate
 ```
+
+
+## Usage
+
+```bash
+python3 manage.py runserver
+```
+
+## License
+[MIT](https://choosealicense.com/licenses/mit/)
