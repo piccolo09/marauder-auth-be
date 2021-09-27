@@ -43,3 +43,4 @@ python3 manage.py runserver
 [license-url]: https://choosealicense.com/licenses/mit/
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://www.linkedin.com/in/keshav-pachpinde-044531211/
+[license-url]: https://github.com/piccolo09/marauder-auth-be/blob/master/LICENSE.txt
