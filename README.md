@@ -10,8 +10,7 @@
 # Marauder
 
 Marauder is a Python - Django application for basic user management setup using django-rest and JWT.
-### Demo
-  <a href="https://murmuring-chamber-51612.herokuapp.com/" target="_blank">Demo</a>
+### <a href="https://murmuring-chamber-51612.herokuapp.com/" target="_blank">Demo</a>
 
 
 
