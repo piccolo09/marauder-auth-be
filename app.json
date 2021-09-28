@@ -3,7 +3,8 @@
     "ENV":"production",
     "SECRET_KEY":{
        "generator":"secret"
-    }
+    },
+    "DEBUG":"false"
  },
  "addons":[
     {
