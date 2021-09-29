@@ -159,10 +159,10 @@ STATIC_URL = '/static/'
 # )
 
 CORS_ORIGIN_ALLOW_ALL = True
-CORS_ORIGIN_WHITELIST = (
-  'http://localhost:8000',
-  'http://localhost:3000',
-)
+# CORS_ORIGIN_WHITELIST = (
+#   'http://localhost:8000',
+#   'http://localhost:3000',
+# )
 
 
 # Default primary key field type
@@ -179,14 +179,14 @@ REST_FRAMEWORK = {
     )
 }
 
-DOMAIN = ('localhost:3000') 
+DOMAIN = config('DOMAIN')
 SITE_NAME = ('Auth_System') 
 DJOSER = {
     "LOGIN_FEILD":"EMAIL",
     "PASSWORD_RESET_CONFIRM_URL": "password/reset/confirm/{uid}/{token}",
     'ACTIVATION_URL': 'activate/{uid}/{token}',
     'SEND_ACTIVATION_EMAIL': True,
-    "SOCIAL_AUTH_ALLOWED_REDIRECT_URIS": ["http://test.localhost/"],
+    "SOCIAL_AUTH_ALLOWED_REDIRECT_URIS": ["https://breathtaker-auth.herokuapp.com/"],
     "PASSWORD_CHANGED_EMAIL_CONFIRMATION":True
 }
 SIMPLE_JWT = (
