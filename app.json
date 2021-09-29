@@ -3,14 +3,12 @@
     "ENV":"production",
     "SECRET_KEY":{
        "generator":"secret"
-    }
+    },
+    "DEBUG":"false"
  },
  "addons":[
     {
        "plan":"heroku-postgresql:hobby-dev"
-    },
-    {
-       "plan":"heroku-redis:hobby-dev"
     }
  ],
 "buildpacks": [
