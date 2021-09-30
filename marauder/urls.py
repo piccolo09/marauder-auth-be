@@ -7,11 +7,11 @@ from drf_yasg import openapi
 
 schema_view = get_schema_view(
    openapi.Info(
-      title="Marauder APIs",
+      title="Proto APIs",
       default_version='v1',
-      description="API Specs",
+      description="API Documentation",
       terms_of_service="/usr/dev/null",
-      contact=openapi.Contact(email="keshav@pleasedont.local"),
+      contact=openapi.Contact(email=""),
       license=openapi.License(name="No License"),
    ),
    public=True,
