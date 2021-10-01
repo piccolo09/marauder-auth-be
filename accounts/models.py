@@ -1,72 +1,43 @@
-
-from re import T
 from django.db import models
-from django.contrib.auth.models import AbstractUser,BaseUserManager, PermissionsMixin
-from django.db.models.query_utils import select_related_descend
-# Create your models here.
 
-# Creating users
-class UserAccountManager(BaseUserManager):
-    
-    def create_user(self,email,password=None,is_admin=False,is_staff=False,is_active=False): #,username,address,
-        if not email:
-            raise ValueError("User Must Have Email ")
-        if not password:
-            raise ValueError("Password is required")
-        email = self.normalize_email(email)
-        user = self.model(email=email)  #username=username,address=address
-        user.set_password(password)
-        user.staff = is_staff
-        user.admin = is_admin
-        user.active = is_active 
-        user.save(self._db)
-        return user
-
-    def create_staffuser(self,email,password=None): #,username,address
-        email = self.normalize_email(email)
-        user = self.model(email=email,password=password)
-        user.staff = True
-        user.active=True 
-        user.save(using=self._db)
-        return user
-
-    
-    def create_superuser(self,email,password=None):
-        email = self.normalize_email(email)
-        user = self.model(email=email,password=password)
-        user.staff = True    
-        user.admin = True
-        user.active=True 
-        user.save(using=self._db)
-        return user
+from django.contrib.auth.base_user import AbstractBaseUser
+from django.contrib.auth.models import PermissionsMixin
+from django.contrib.auth.validators import UnicodeUsernameValidator
+import uuid
+from .managers import UserManager
 
 
-class UserAccount(AbstractUser):
-    email = models.EmailField(max_length=255,unique=True)
-    address = models.TextField(blank=True,null=True)
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username','address']
+class User(PermissionsMixin, AbstractBaseUser):
 
-    # def get_full_name(self):
-    #     return self.email
+    uuid = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False, unique=True)
+    username_validator = UnicodeUsernameValidator()
+    username = models.CharField(
+        'Username',
+        max_length=255,
+        unique=True, validators=[username_validator])
+    is_active = models.BooleanField('Active', default=True)
 
-    # def get_short_name(self):
-    #     return self.email
+    # allow non-unique emails
+    email = models.EmailField('Email address', blank=True)
+    is_staff = models.BooleanField(
+        'staff status',
+        default=False,
+        help_text='Designates whether the user can log into this admin site.'
+    )
 
-    # def __str__(self):
-    #     return self.email
-    
+    USERNAME_FIELD = 'username'
+    EMAIL_FIELD = 'email'
+    REQUIRED_FIELDS = ['email']  # used only on createsuperuser
 
-    # @property
-    # def is_staff(self):
-    #     "Is the user a member of staff?"
-    #     return self.staff
+    created_at = models.DateTimeField('Created at', auto_now_add=True)
+    updated_at = models.DateTimeField('Updated at', auto_now=True)
 
-    # @property
-    # def is_admin(self):
-    #     "Is the user a admin member?"
-    #     return self.admin
+    @property
+    def is_django_user(self):
+        return self.has_usable_password()
 
-    # @property
-    # def is_active(self):
-    #     return self.active
+    def __repr__(self):
+        return f'<{self.__class__.__name__} {self.uuid}>'
+
+    objects = UserManager()
