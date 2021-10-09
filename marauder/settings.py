@@ -153,43 +153,27 @@ USE_TZ = True
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
-EMAIL_HOST = 'smtp.mailtrap.io'
+EMAIL_HOST = 'localhost'
 
-EMAIL_HOST_USER = 'cd6be89df92de8'
+# EMAIL_HOST_USER = 'cd6be89df92de8'
 
-EMAIL_HOST_PASSWORD = '2cee8074f35cbf'
+# EMAIL_HOST_PASSWORD = '2cee8074f35cbf'
 
-EMAIL_PORT = '2525'
-
-
-COGNITO_AWS_REGION = 'us-east-2'
-COGNITO_USER_POOL = 'us-east-2_Z4uNPkF2L'
-# Provide this value if `id_token` is used for authentication (it contains 'aud' claim).
-# `access_token` doesn't have it, in this case keep the COGNITO_AUDIENCE empty
-COGNITO_AUDIENCE = None
-COGNITO_POOL_URL = None  # will be set few lines of code later, if configuration provided
-
-rsa_keys = {}
+EMAIL_PORT = '1025'
 
 
-if COGNITO_AWS_REGION and COGNITO_USER_POOL:
-    COGNITO_POOL_URL = 'https://cognito-idp.{}.amazonaws.com/{}'.format(
-        COGNITO_AWS_REGION, COGNITO_USER_POOL)
-    pool_jwks_url = COGNITO_POOL_URL + '/.well-known/jwks.json'
-    jwks = json.loads(request.urlopen(pool_jwks_url).read())
-    rsa_keys = {key['kid']: json.dumps(key) for key in jwks['keys']}
 
-SIMPLE_JWT = (
-    {
-        'BLACKLIST_AFTER_ROTATION': False,
-        # set simple jwt expiry for jwt token
-        'ACCESS_TOKEN_LIFETIME': timedelta(minutes=500),
-        # set simple jwt expiry for jwt token
-        'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
-        'SIGNING_KEY': rsa_keys,
-        'ALGORITHM': 'RS256',
-        'AUDIENCE': COGNITO_AUDIENCE,
-        'ISSUER': COGNITO_POOL_URL,
-        'AUTH_HEADER_TYPES': ('Bearer',),
-    }
-)
+# SIMPLE_JWT = (
+#     {
+#         'BLACKLIST_AFTER_ROTATION': False,
+#         # set simple jwt expiry for jwt token
+#         'ACCESS_TOKEN_LIFETIME': timedelta(minutes=500),
+#         # set simple jwt expiry for jwt token
+#         'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+#         'SIGNING_KEY': rsa_keys,
+#         'ALGORITHM': 'RS256',
+#         'AUDIENCE': COGNITO_AUDIENCE,
+#         'ISSUER': COGNITO_POOL_URL,
+#         'AUTH_HEADER_TYPES': ('Bearer',),
+#     }
+# )

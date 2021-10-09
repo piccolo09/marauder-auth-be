@@ -26,7 +26,7 @@ class CustomUserChangeForm(UserChangeForm):
 @admin.register(User)
 class CustomUserAdmin(UserAdmin):
     fieldsets = (
-        (None, {'fields': ('username', 'email', 'password', )}),
+        (None, {'fields': ('email', 'password', )}),
         (
             _('Permissions'),
             {
@@ -42,9 +42,9 @@ class CustomUserAdmin(UserAdmin):
     add_fieldsets = (
         (None, {
             'classes': ('wide', ),
-            'fields': ('username', 'email', 'password1', 'password2', ),
+            'fields': ('email', 'password1', 'password2', ),
         }),
     )
     form = CustomUserChangeForm
     add_form = CustomUserCreationForm
-    list_display = ('username', 'is_staff', 'is_active', )
+    list_display = ('email', 'is_staff', 'is_active', )
