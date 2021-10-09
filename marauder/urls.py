@@ -24,11 +24,10 @@ swaggerd = [
 ]
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-   #  path('auth/', include("djoser.urls.base")),
-    # path('auth/', include("djoser.urls.authtoken")),
-    path('auth/', include("djoser.urls.jwt")),
-    path('auth/', include("djoser.urls")),
+   path('admin/', admin.site.urls),
+   path('auth/', include("djoser.urls.base")),
+   # path('auth/', include("djoser.urls.authtoken")),
+   path('auth/', include("djoser.urls.jwt")),
 ]
 
 urlpatterns = urlpatterns+swaggerd
