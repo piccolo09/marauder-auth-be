@@ -54,6 +54,10 @@ class User(PermissionsMixin, AbstractBaseUser):
     updated_at = models.DateTimeField('Updated at', auto_now=True)
     last_login = models.DateTimeField(_('last login'), blank=True, null=True)
 
+    activated = models.DateTimeField(_("Account Activated"), blank=True, null=True)
+    email_confirmed = models.DateTimeField(_("Email Confirmed"), blank=True, null=True)
+    setup_completed = models.DateTimeField(_("Setup Complete"), blank=True, null=True)
+
     @property
     def is_django_user(self):
         return self.has_usable_password()
@@ -81,3 +85,14 @@ class User(PermissionsMixin, AbstractBaseUser):
     def email_user(self, subject, message, from_email=None, **kwargs):
         """Send an email to this user."""
         send_mail(subject, message, from_email, [self.email], **kwargs)
+
+
+class UserProfile(models.Model):
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
+
+    address = models.CharField(_("Permanant Address"), max_length=255, blank=True, null=True)
+    department = models.CharField(_("Work Department"), max_length=255, blank=True, null=True)
+
+    # is_activated = models.BooleanField(_("Account Activated"),)
+    # email_confirmed = models.BooleanField(_("Account Activated"),)
