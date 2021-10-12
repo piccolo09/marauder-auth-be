@@ -1,11 +1,13 @@
 from datetime import datetime
+from django.db.models import fields
 from django.utils.timezone import make_aware
+from django.contrib.auth import get_user_model
+from django.db import IntegrityError, transaction
 from rest_framework.exceptions import ValidationError
 from rest_framework import serializers
-from django.contrib.auth import get_user_model
 from djoser.conf import settings
-from django.db import IntegrityError, transaction
 from djoser import utils
+from .models import UserProfile
 User = get_user_model()
 
 
@@ -32,6 +34,22 @@ class UserInviteSerialiser(serializers.ModelSerializer):
                 user.is_active = False
                 user.save(update_fields=["is_active"])
         return user
+
+
+
+class ProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserProfile
+        # fields = "__all__"
+        fields = ('department',"address")
+
+class UserProfileSerializer(serializers.ModelSerializer):
+
+    profile = ProfileSerializer()
+    class Meta:
+        model = User
+        fields = ("profile","first_name","last_name","email","id")
+
 
 
 class AcceptInviteSeralizer(serializers.Serializer):

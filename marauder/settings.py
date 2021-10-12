@@ -143,7 +143,14 @@ DJOSER = {
         'password_changed_confirmation': 'djoser.email.PasswordChangedConfirmationEmail',
         'username_changed_confirmation': 'djoser.email.UsernameChangedConfirmationEmail',
         'username_reset': 'djoser.email.UsernameResetEmail',
+    },
+    "PERMISSIONS": {
+        'username_reset': ['accounts.permissions.DenyAny'],
+    },
+    "SERIALIZERS": {
+        'current_user': 'accounts.serializers.UserProfileSerializer',
     }
+
 }
 
 LANGUAGE_CODE = 'en-us'

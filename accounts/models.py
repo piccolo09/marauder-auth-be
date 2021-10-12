@@ -10,7 +10,7 @@ from .managers import UserManager
 
 class User(PermissionsMixin, AbstractBaseUser):
 
-    uuid = models.UUIDField(
+    id = models.UUIDField(
         primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     username_validator = UnicodeUsernameValidator()
     username = models.CharField(
