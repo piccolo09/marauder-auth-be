@@ -1,13 +1,15 @@
 from django.contrib import admin
 from django.contrib.auth.models import User
 from .models import User
-from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm, UsernameField
 from django.utils.translation import ugettext_lazy as _
+from accounts.models import User,UserProfile
 
-from accounts.models import User
 
+class UserProfileAdminInline(admin.StackedInline):
+    model = UserProfile
+    fields = ("address","department")
 
 class CustomUserCreationForm(UserCreationForm):
 
@@ -26,7 +28,7 @@ class CustomUserChangeForm(UserChangeForm):
 @admin.register(User)
 class CustomUserAdmin(UserAdmin):
     fieldsets = (
-        (None, {'fields': ('username', 'email', 'password', )}),
+        (None, {'fields': ('email', 'password', )}),
         (
             _('Permissions'),
             {
@@ -36,15 +38,17 @@ class CustomUserAdmin(UserAdmin):
                     'user_permissions')
             }
         ),
-        (_('Important dates'), {'fields': ('created_at', 'updated_at', )}),
+        (_('Important dates'), {'fields': ('created_at', 'updated_at', 'activated', 'email_confirmed')}),
+
     )
     readonly_fields = ('created_at', 'updated_at', )
     add_fieldsets = (
         (None, {
             'classes': ('wide', ),
-            'fields': ('username', 'email', 'password1', 'password2', ),
+            'fields': ('email', 'password1', 'password2', ),
         }),
     )
     form = CustomUserChangeForm
     add_form = CustomUserCreationForm
-    list_display = ('username', 'is_staff', 'is_active', )
+    list_display = ('email', 'is_staff', 'is_active', )
+    inlines = [UserProfileAdminInline]
