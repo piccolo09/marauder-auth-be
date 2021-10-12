@@ -3,7 +3,7 @@ from .views import UserInvitationViewSet
 from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()
-router.register("members", UserInvitationViewSet)
+router.register("invite", UserInvitationViewSet)
 
 
 urlpatterns = router.urls

@@ -1,6 +1,6 @@
 # from templated_mail import BaseEmailMessage
 from templated_mail.mail import BaseEmailMessage
-from djoser import utils
+from djoser import utils,email
 from .tokens import invite_accept_token
 from djoser.conf import settings
 
@@ -16,3 +16,7 @@ class InvitationEmail(BaseEmailMessage):
         context["token"] = invite_accept_token.make_token(user)
         context["url"] = settings.INVITATION_URL.format(**context)
         return context
+
+
+class PasswordResetEmail(email.PasswordResetEmail):
+    template_name = "email/password_reset_v1.html"

@@ -129,15 +129,21 @@ REST_FRAMEWORK = {
 }
 
 
-
 DJOSER = {
     "LOGIN_FEILD": "EMAIL",
     'PASSWORD_RESET_CONFIRM_URL': "password/reset/confirm/{uid}/{token}",
     'ACTIVATION_URL': 'activate/{uid}/{token}',
     'SEND_ACTIVATION_EMAIL': True,
     'PASSWORD_CHANGED_EMAIL_CONFIRMATION': True,
-    'INVITATION_URL': 'acceptinvite/{uid}/{token}'
-
+    'INVITATION_URL': 'acceptinvite/{uid}/{token}',
+    "EMAIL": {
+        'activation': 'djoser.email.ActivationEmail',
+        'confirmation': 'djoser.email.ConfirmationEmail',
+        'password_reset': 'accounts.email.PasswordResetEmail',
+        'password_changed_confirmation': 'djoser.email.PasswordChangedConfirmationEmail',
+        'username_changed_confirmation': 'djoser.email.UsernameChangedConfirmationEmail',
+        'username_reset': 'djoser.email.UsernameResetEmail',
+    }
 }
 
 LANGUAGE_CODE = 'en-us'
