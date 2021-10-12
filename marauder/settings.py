@@ -12,6 +12,12 @@ DEBUG = config('DEBUG', default=True, cast=bool)
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='*')
 
+# TODO CHANGE THIS
+DOMAIN = 'TEST'
+
+# TODO CHANGE THIS
+SITE_NAME = 'TEST'
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -40,7 +46,6 @@ MIDDLEWARE = [
 ]
 
 AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.RemoteUserBackend',
     'django.contrib.auth.backends.ModelBackend',
 ]
 
@@ -123,11 +128,6 @@ REST_FRAMEWORK = {
     )
 }
 
-# TODO CHANGE THIS
-DOMAIN = 'TEST'
-
-# TODO CHANGE THIS
-SITE_NAME = 'Marauder'
 
 
 DJOSER = {
@@ -154,24 +154,10 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 EMAIL_HOST = 'localhost'
 
-# EMAIL_HOST_USER = 'cd6be89df92de8'
-
-# EMAIL_HOST_PASSWORD = '2cee8074f35cbf'
-
 EMAIL_PORT = '1025'
 
 
 # SIMPLE_JWT = (
 #     {
-#         'BLACKLIST_AFTER_ROTATION': False,
-#         # set simple jwt expiry for jwt token
-#         'ACCESS_TOKEN_LIFETIME': timedelta(minutes=500),
-#         # set simple jwt expiry for jwt token
-#         'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
-#         'SIGNING_KEY': rsa_keys,
-#         'ALGORITHM': 'RS256',
-#         'AUDIENCE': COGNITO_AUDIENCE,
-#         'ISSUER': COGNITO_POOL_URL,
-#         'AUTH_HEADER_TYPES': ('Bearer',),
 #     }
 # )

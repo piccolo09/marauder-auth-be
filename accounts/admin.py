@@ -38,7 +38,7 @@ class CustomUserAdmin(UserAdmin):
                     'user_permissions')
             }
         ),
-        (_('Important dates'), {'fields': ('created_at', 'updated_at', )}),
+        (_('Important dates'), {'fields': ('created_at', 'updated_at', 'activated', 'email_confirmed')}),
 
     )
     readonly_fields = ('created_at', 'updated_at', )
