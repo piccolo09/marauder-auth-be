@@ -1,85 +1,134 @@
-from django.db import transaction 
 from django.contrib.auth import get_user_model
-from rest_framework import viewsets, mixins,status, generics, status, views
-from djoser.conf import settings
-from djoser.compat import get_user_email
-from rest_framework.decorators import action
-from .serializers import UserInviteSerialiser,AcceptInviteSeralizer
-from rest_framework.response import Response
-from .email import InvitationEmail
-from djoser import utils
-from .tokens import invite_accept_token,password_reset_token
-from marauder_utils.views import ActionBasedSerializerMixin
-User = get_user_model()
+from rest_framework.decorators import action, api_view
+from rest_framework import response, status
+from rest_framework_simplejwt.views import TokenObtainPairView
 from djoser.views import UserViewSet
+from djoser.conf import settings as djoser_settings
+from django.conf import settings as _settings
+from djoser.compat import get_user_email
+from djoser import signals
+from .tokens import invite_accept_token
+from .emails import InvitationEmail
+from .serializers import (
+    CustomTokenObtainPairSerializer, PublicUserSerializer,CustomSendEmailResetSerializer,
+    UserInviteSerializer, InvitationTokenSerializer
+    )
+import jwt
+User = get_user_model()
 
 
-class UserInvitationViewSet(ActionBasedSerializerMixin,mixins.CreateModelMixin, viewsets.GenericViewSet):
-    queryset = User.objects.all()
-    serializer_class = UserInviteSerialiser
-    lookup_field = settings.USER_ID_FIELD
-    # permission_classes = (AllowAny,)
-    serializer_class_by_action = {
-        "send":UserInviteSerialiser,
-        "accept":AcceptInviteSeralizer,
-    }
-    token_generator = invite_accept_token
+class TokenGenratorView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
 
 
-    # @action(["post"], detail=False)
-    # def send(self, request, *args, **kwargs):
-    #     return self.create(request, *args, **kwargs)
+class UserManagementViewset(UserViewSet):
+    invite_token_generator = invite_accept_token
 
-    def perform_create(self, serializer):
-        user = serializer.save()
-        context = {"user": user}
-        to = [get_user_email(user)]
-        InvitationEmail(self.request, context).send(to)
+    def get_permissions(self):
+        if self.action == "invite":
+            self.permission_classes = djoser_settings.PERMISSIONS.password_reset
+        elif self.action == "invite_resend":
+            self.permission_classes = djoser_settings.PERMISSIONS.password_reset
+        elif self.action == "invite_accept":
+            self.permission_classes = djoser_settings.PERMISSIONS.activation
 
-    @action(["post"], detail=False)
-    @transaction.atomic
-    def accept(self, request, *args, **kwargs):
+        return super().get_permissions()
+
+    def get_serializer_class(self):
+        if self.action == "invite":
+            # TODO: Sync up with settings
+            return UserInviteSerializer
+        elif self.action == "invite_resend":
+            # TODO: Sync up with settings
+            return CustomSendEmailResetSerializer
+        elif self.action == "invite_accept":
+            return InvitationTokenSerializer
+        return super().get_serializer_class()
+
+    def reset_username(self, request, *args, **kwargs):
+        """
+        Supressing method
+        """
+        pass
+
+    def set_username(self, request, *args, **kwargs):
+        """
+        Supressing method
+        """
+        pass
+
+    def reset_username_confirm(self, request, *args, **kwargs):
+        """
+        Supressing method
+        """
+        pass
+
+    @action(["post", "delete"], detail=False)
+    def invite(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.activate()
-        user = self.serializer_class(serializer.user).data
-        user.update(
-            {
-                "uid": utils.encode_uid(serializer.user.pk),
-                "password_setup_key": password_reset_token.make_token(serializer.user)
-            }
+        user = serializer.save()
+        signals.user_registered.send(
+            sender=self.__class__, user=user, request=self.request
         )
-        return Response(user, status=status.HTTP_202_ACCEPTED)
+        context = {"user": user}
+        to = [get_user_email(user)]
+        # TODO CONVERT TO SETTINGS:
+        InvitationEmail(self.request, context).send(to)
+        headers = self.get_success_headers(serializer.data)
+        return response.Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+    @action(["post"], detail=False)
+    def invite_resend(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        # can only resend invite to users without a valid password and inactive account
+        user = serializer.get_invited_user()
+        if not user:
+            return response.Response("Invitation already Accepted.", status=status.HTTP_400_BAD_REQUEST)
+        context = {"user": user}
+        to = [get_user_email(user)]
+        # TODO Sync up with SETTINGS:
+        InvitationEmail(self.request, context).send(to)
+        return response.Response(status=status.HTTP_202_ACCEPTED)
+
+    @action(["post"], detail=False)
+    def invite_accept(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.user
+        if hasattr(user, "activated"):
+            user.activated = True
+        user.save()
+        data_to_setup = self.get_safe_user_repr(user)
+        # resp = djoser_settings.SERIALIZERS.current_user(user)
+        data_to_setup.update({
+            "token": self.token_generator.make_token(user),
+            "uid": serializer.initial_data.get("uid", "")
+            })
+        return response.Response(data=data_to_setup,status=status.HTTP_200_OK)
+
+    @action(["post"], detail=False)
+    def setup_profile(self, request, *args, **kwargs):
+        pass
+
+    def get_safe_user_repr(self,user):
+            return{
+                "first_name": getattr(user, "first_name", ""),
+                "last_name": getattr(user, "last_name", ""),
+                }
 
 
-
-# class UserViewset(UserViewSet):
-
-#     def get_permissions(self):
-#         if self.action == "invite":
-#             self.permission_classes = settings.PERMISSIONS.user_create
-#         if self.action == "accept_invite":
-#             self.permission_classes = settings.PERMISSIONS.user_create
-#         return super().get_permissions()
-
-#     def get_serializer_class(self):
-#         if self.action == "invite":
-#             return UserInviteSerialiser
-#         elif self.action == "accept_invite":
-#             return AcceptInviteSeralizer
-#         return super().get_permissions()
-    
-#     @action(["post"], detail=False)
-#     @transaction.atomic
-#     def accept_invite(self, request, *args, **kwargs):
-#         serializer = self.get_serializer(data=request.data)
-#         serializer.is_valid(raise_exception=True)
-#         serializer.activate()
-#         user = self.serializer_class(serializer.user).data
-#         user.update(
-#             {
-#                 "uid": utils.encode_uid(serializer.user.pk),
-#                 "password_setup_key": password_reset_token.make_token(serializer.user)
-#             }
-#         )
-#         return Response(user, status=status.HTTP_202_ACCEPTED)
+@api_view(['GET'])
+def get_public_key(request):
+    """
+        GET PUBLIC KEY FOR JWT TOKEN VERIFICATION FOR INTEGRATION WITH OTHER APPS 
+    """
+    response_content, status_code = None, status.HTTP_403_FORBIDDEN
+    if "HS" not in _settings.SIMPLE_JWT.get('ALGORITHM', ''):
+        response_content = {
+            "alg": _settings.SIMPLE_JWT.get('ALGORITHM', False),
+            "use": _settings.PUBLIC_KEY
+            }
+        status_code = status.HTTP_200_OK
+    return response.Response(response_content, status=status_code)

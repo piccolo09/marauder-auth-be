@@ -22,11 +22,9 @@ swaggerd = [
 ]
 
 urlpatterns = [
-    path('auth/', include("djoser.urls.base")),
     path('admin/', admin.site.urls),
-    path('auth/', include("djoser.urls.jwt")),
-    path('auth/', include("accounts.urls")),
-
+    path('auth/', include("accounts.urls_usermanagment")),
+    path('auth/', include("accounts.urls_jwt")),
 ]
 
 urlpatterns = urlpatterns + swaggerd

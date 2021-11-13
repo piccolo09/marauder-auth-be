@@ -1,54 +1,50 @@
 from django.contrib import admin
-from django.contrib.auth.models import User
-from .models import User
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm, UsernameField
 from django.utils.translation import ugettext_lazy as _
-from accounts.models import User,UserProfile
+from .models import User
 
 
-class UserProfileAdminInline(admin.StackedInline):
-    model = UserProfile
-    fields = ("address","department")
-
-class CustomUserCreationForm(UserCreationForm):
-
+class AdminUserCreationForm(UserCreationForm):
+    """
+        Custom Create Form for user creation
+    """
     class Meta(UserCreationForm.Meta):
         model = User
+        fields = ("email",)
 
-
-class CustomUserChangeForm(UserChangeForm):
+class AdminUserChangeForm(UserChangeForm):
 
     class Meta(UserCreationForm.Meta):
         model = User
         fields = '__all__'
-        field_classes = {'username': UsernameField}
-
+        # field_classes = {'username': UsernameField}
 
 @admin.register(User)
 class CustomUserAdmin(UserAdmin):
     fieldsets = (
-        (None, {'fields': ('email', 'password', )}),
+        (_("Basic Info"), {
+            'classes': ('collapse', ),
+            'fields': ('email', 'password','first_name','last_name','inviter')}),
         (
             _('Permissions'),
             {
                 'fields': (
-                    'is_active', 'is_staff',
+                    'is_active', 'is_staff','activated',
                     'is_superuser', 'groups',
                     'user_permissions')
             }
         ),
-        (_('Important dates'), {'fields': ('created_at', 'updated_at', 'activated', 'email_confirmed')}),
-
+        (_('Important dates'), {'fields': ('created_by','created_date', 'updated_date','updated_by', 'last_login')}),
     )
-    readonly_fields = ('created_at', 'updated_at', )
+    readonly_fields = ('created_date', 'updated_date', 'last_login','updated_by','created_by')
     add_fieldsets = (
-        (None, {
+        (_("Basics"), {
             'classes': ('wide', ),
             'fields': ('email', 'password1', 'password2', ),
         }),
     )
-    form = CustomUserChangeForm
-    add_form = CustomUserCreationForm
-    list_display = ('email', 'is_staff', 'is_active', )
-    inlines = [UserProfileAdminInline]
+    form = AdminUserChangeForm
+    add_form = AdminUserCreationForm
+    list_display = ('email', 'is_staff', 'is_active','first_name', 'last_name')
+    ordering = ('email',)
